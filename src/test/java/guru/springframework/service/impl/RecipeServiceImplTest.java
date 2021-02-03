@@ -2,7 +2,7 @@ package guru.springframework.service.impl;
 
 import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.RecipeRepository;
-import guru.springframework.service.RecipeService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -61,9 +61,9 @@ public class RecipeServiceImplTest {
         //given
         when(recipeRepository.findById(anyLong())).thenThrow(RuntimeException.class);
         //when
-        Recipe recipe = recipeService.getRecipeById(3L);
-        //then
-        assertNull(recipe);
+        Assertions.assertThrows(RuntimeException.class, () -> {
+            recipeService.getRecipeById(3L);
+        });
         verify(recipeRepository, times(1)).findById(anyLong());
     }
 }
