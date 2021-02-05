@@ -1,5 +1,8 @@
 package guru.springframework.service.impl;
 
+import guru.springframework.commands.RecipeCommand;
+import guru.springframework.converters.RecipeCommandToRecipe;
+import guru.springframework.converters.RecipeToRecipeCommand;
 import guru.springframework.domain.Recipe;
 import guru.springframework.repositories.RecipeRepository;
 import org.junit.jupiter.api.Assertions;
@@ -22,6 +25,10 @@ public class RecipeServiceImplTest {
 
     @Mock
     RecipeRepository recipeRepository ;
+    @Mock
+    RecipeCommandToRecipe commandToRecipe ;
+    @Mock
+    RecipeToRecipeCommand recipeToCommand ;
     @InjectMocks
     RecipeServiceImpl recipeService ;
     Recipe recipeFounded ;
@@ -65,5 +72,44 @@ public class RecipeServiceImplTest {
             recipeService.getRecipeById(3L);
         });
         verify(recipeRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void saveRecipeCommandTest() {
+        //given
+        RecipeCommand commandPassed = new RecipeCommand();
+        RecipeCommand commandReturned = new RecipeCommand();
+        commandReturned.setId(1L);
+        Recipe recipe = new Recipe();
+        when(commandToRecipe.convert(commandPassed)).thenReturn(recipe);
+        when(recipeRepository.save(recipe)).thenReturn(recipeFounded);
+        when(recipeToCommand.convert(recipeFounded)).thenReturn(commandReturned);
+        //when
+        RecipeCommand savedRecipeCommand = recipeService.saveRecipeCommand(commandPassed);
+        //then
+        Assertions.assertNotNull(savedRecipeCommand);
+        assertEquals(commandReturned.getId(), savedRecipeCommand.getId());
+    }
+
+    @Test
+    void findRecipeCommandById() {
+        //given
+        RecipeCommand returnedRecipeCommand = new RecipeCommand();
+        returnedRecipeCommand.setId(1L);
+        when(recipeRepository.findById(anyLong())).thenReturn(Optional.ofNullable(recipeFounded));
+        when(recipeToCommand.convert(any(Recipe.class))).thenReturn(returnedRecipeCommand) ;
+        //when
+        RecipeCommand recipeCommandById = recipeService.findRecipeCommandById(1L);
+        //then
+        assertNotNull(recipeCommandById);
+        verify(recipeRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void deleteRecipeByIdTest() {
+        //when
+        recipeService.deleteRecipeById(recipeId);
+        //then
+        verify(recipeRepository, times(1)).deleteById(any());
     }
 }
