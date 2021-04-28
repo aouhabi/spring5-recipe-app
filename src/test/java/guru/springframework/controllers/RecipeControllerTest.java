@@ -16,6 +16,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -38,7 +40,9 @@ public class RecipeControllerTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build() ;
+        mockMvc = MockMvcBuilders.standaloneSetup(controller)
+                .setControllerAdvice(new ControllerExceptionHandler())
+                .build() ;
         recipe = new Recipe();
         recipe.setId(1L);
 
