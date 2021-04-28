@@ -2,6 +2,7 @@ package guru.springframework.controllers;
 
 import guru.springframework.commands.RecipeCommand;
 import guru.springframework.domain.Recipe;
+import guru.springframework.exceptions.NotFoundException;
 import guru.springframework.service.RecipeService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,6 +67,15 @@ public class RecipeControllerTest {
         Recipe argumentCaptorValue = argumentCaptor.getValue();
         assertEquals(recipe.getId(),argumentCaptorValue.getId());
 
+    }
+    @Test
+    public void testGetRecipeNotFound() throws Exception {
+
+        when(service.getRecipeById(anyLong())).thenThrow(NotFoundException.class);
+
+        mockMvc.perform(get("/recipe/1/show"))
+                .andExpect(status().isNotFound())
+                .andExpect(view().name("404error"));
     }
 
     @Test
